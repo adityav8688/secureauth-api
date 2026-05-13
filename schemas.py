@@ -9,3 +9,7 @@ class userInfo(BaseModel):
 class userCreate(BaseModel):
     email: EmailStr
     password: str
+
+class itemInfo(BaseModel):
+    name: str
+    price: float

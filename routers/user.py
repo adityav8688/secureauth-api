@@ -5,9 +5,9 @@ import models, schemas
 from securities import hash_password, verify_password
 from auth import create_token
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+user_router = APIRouter(prefix="/auth", tags=["Auth"])
 
-@router.post("/register")
+@user_router.post("/register")
 def register(user: schemas.userCreate, db: Session=Depends(get_db)):
     existing = db.query(models.User).filter(models.User.email == user.email).first()
     if existing or "":
@@ -23,8 +23,8 @@ def register(user: schemas.userCreate, db: Session=Depends(get_db)):
 
     return {"message": "user created "+new_user.email}
 
-@router.get("/login")
-def login(user: schemas.userInfo, db: Session=Depends(get_db)):
+@user_router.post("/login")
+def login(user: schemas.userCreate, db: Session=Depends(get_db)):
     ex_user = db.query(models.User).filter(models.User.email == user.email).first()
 
     if not ex_user or not (verify_password(user.password, ex_user.password)):

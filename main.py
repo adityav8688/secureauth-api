@@ -1,11 +1,21 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
+from typing import Annotated
 from database import Base, engine
-from user import router
-import models
+from routers.user import user_router
+from routers.items import item_router
+from pydantic import BaseModel
+from schemas import itemInfo
 
 app = FastAPI()
 
-app.include_router(router)
+app.include_router(user_router)
+app.include_router(item_router)
+
+# class Item(BaseModel):
+#     name: Annotated[str, Query(min_length=3, max_length=15)]
+#     discription: Annotated[str|None , Query(max_length=200)]
+#     price: float
+#     tax: Annotated[float | None, Query()]
 
 @app.on_event("startup")
 def on_startup():
@@ -13,4 +23,16 @@ def on_startup():
 
 @app.get("/")
 def root():
-    return {"message":"Backend is running."}
+    return {"message":"it is updating even now"}
+
+# @app.post("/items/")
+# def read_items(item: itemInfo):
+#     item_dict = item.model_dump()
+#     if item.tax != 0:
+#         total = item.price + item.tax
+#         item_dict.update({"total":total})
+#     return item_dict
+
+# @app.post("/items")
+# def create_items(item: itemInfo):
+#     pass
