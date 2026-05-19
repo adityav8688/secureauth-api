@@ -1,10 +1,7 @@
-from fastapi import FastAPI, Query
-from typing import Annotated
+from fastapi import FastAPI
 from database import Base, engine
 from routers.user import user_router
 from routers.items import item_router
-from pydantic import BaseModel
-from schemas import itemInfo
 
 app = FastAPI()
 

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 
 class userInfo(BaseModel):
@@ -8,7 +8,7 @@ class userInfo(BaseModel):
 
 class userCreate(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(max_length=100)
 
 class itemInfo(BaseModel):
     name: str
