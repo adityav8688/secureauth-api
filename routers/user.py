@@ -5,6 +5,7 @@ from database import get_db
 import models, schemas
 from securities import hash_password, verify_password
 from auth import create_token, get_current_user
+from typing import Annotated
 
 user_router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -25,10 +26,12 @@ def register(user: schemas.userCreate, db: Session=Depends(get_db)):
     return {"message": "user created "+new_user.email}
 
 @user_router.post("/login")
-def login(user: OAuth2PasswordRequestForm = Depends(), db: Session=Depends(get_db)):
+def login(user: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session=Depends(get_db)):
     ex_user = db.query(models.User).filter(models.User.email == user.username).first()
 
-    if not ex_user or not (verify_password(user.password, ex_user.password)):
+    if not ex_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    elif not (verify_password(user.password, ex_user.password)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     token = create_token({"sub": str(ex_user.id)})
@@ -45,4 +48,4 @@ def users(db: Session = Depends(get_db)):
 
 @user_router.get("/user")
 def current_user(user: models.User = Depends(get_current_user)):
-    return user
+    return {"name":str(user.email).split("@")[0]}

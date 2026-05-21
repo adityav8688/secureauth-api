@@ -2,11 +2,25 @@ from fastapi import FastAPI
 from database import Base, engine
 from routers.user import user_router
 from routers.items import item_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",  
+    "http://127.0.0.1:5173",
+]
+
 app.include_router(user_router)
 app.include_router(item_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # class Item(BaseModel):
 #     name: Annotated[str, Query(min_length=3, max_length=15)]

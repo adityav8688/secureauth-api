@@ -13,7 +13,7 @@ ALGORITHM = "HS256"
 
 def create_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=1)
+    expire = datetime.now(timezone.utc) + timedelta(hours=2)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -30,22 +30,36 @@ def get_current_user(
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
-
-        user_id = payload.get("sub")
-        print(datetime.fromtimestamp(payload.get("exp"), tz=timezone.utc))
-        
-        user_id = int(user_id)
     except ExpiredSignatureError:
-        return {"TOken expired"}
+        raise HTTPException(
+            status_code=401,
+            detail="token expired"
+        )
 
     except JWTError:
-        return {"Invalid Token"}
+        raise HTTPException(
+            status_code=401,
+            detail="invalid token"
+        )
+    
+    user_id = payload.get("sub")        
+
+    if user_id is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
+        
+    user_id = int(user_id)
     
     user = db.query(models.User).filter(
         models.User.id == user_id
     ).first()
 
     if user is None:
-        return {"Wrong username of password"}
+        raise HTTPException(
+            status_code=401,
+            detail="user not found"
+        )
     
     return user

@@ -11,5 +11,6 @@ class userCreate(BaseModel):
     password: str = Field(max_length=100)
 
 class itemInfo(BaseModel):
+    id: int
     name: str
     price: float
